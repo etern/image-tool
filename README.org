@@ -3,9 +3,14 @@
 
 * Use FUSE to view web image
 
-./image-tool <mount-point> <website>
+** Usage:
+start server: ~./image-tool <mount-point> <website>~
+
+access fs: ~cd <mount-point>; ls~
+
+unmount fs: ~fusermount -u <mount-point>~ or ~sudo umount -l <mount-point>~
 
 * Todos
-- base64 embeded images
+- embeded images
 - js generated images
-
+- cache & preload

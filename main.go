@@ -18,13 +18,12 @@ import (
 
 func normalizeUrl(s string, parent_url string) string {
 	u, _ := url.Parse(s)
-	if len(u.Scheme) == 0 {
-		u.Scheme = "http"
-	}
-	if !u.IsAbs() {
+	if !u.IsAbs() { // must before assign Scheme
 		pu, _ := url.Parse(parent_url)
 		u.Host = pu.Host
-		fmt.Println("========", s, u)
+	}
+	if len(u.Scheme) == 0 {
+		u.Scheme = "http"
 	}
 	return u.String()
 }
@@ -32,7 +31,7 @@ func normalizeUrl(s string, parent_url string) string {
 func findImages(url string) (images []string, err error) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("findImages", err)
 		return nil, err
 	}
 
@@ -50,7 +49,7 @@ func findImages(url string) (images []string, err error) {
 func findLinks(url string) (links []string, err error) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("findLinks", err)
 		return nil, err
 	}
 
