@@ -1,0 +1,11 @@
+#+titile: image-tool
+#+startup: showall
+
+* Use FUSE to view web image
+
+./image-tool <mount-point> <website>
+
+* Todos
+- base64 embeded images
+- js generated images
+
