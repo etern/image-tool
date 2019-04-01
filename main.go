@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"flag"
 	"log"
 	"path"
@@ -16,11 +15,12 @@ import (
 	"github.com/hanwen/go-fuse/fuse/pathfs"
 )
 
-func normalizeUrl(s string, parent_url string) string {
+func NormalizeUrl(s string, parent_url string) string {
 	u, _ := url.Parse(s)
 	if !u.IsAbs() { // must before assign Scheme
 		pu, _ := url.Parse(parent_url)
 		u.Host = pu.Host
+		u.Scheme = pu.Scheme
 	}
 	if len(u.Scheme) == 0 {
 		u.Scheme = "http"
@@ -28,10 +28,10 @@ func normalizeUrl(s string, parent_url string) string {
 	return u.String()
 }
 
-func findImages(url string) (images []string, err error) {
+func FindImages(url string) (images []string, err error) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
-		log.Println("findImages", err)
+		log.Println("FindImages", err)
 		return nil, err
 	}
 
@@ -41,15 +41,15 @@ func findImages(url string) (images []string, err error) {
 		if len(src) == 0 || strings.HasPrefix(src, "data:image") {
 			return // neglect base64 embeded image
 		}
-		images = append(images, normalizeUrl(src, url))
+		images = append(images, NormalizeUrl(src, url))
 	})
 	return images, nil
 }
 
-func findLinks(url string) (links []string, err error) {
+func FindLinks(url string) (links []string, err error) {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
-		log.Println("findLinks", err)
+		log.Println("FindLinks", err)
 		return nil, err
 	}
 
@@ -59,7 +59,7 @@ func findLinks(url string) (links []string, err error) {
 		if len(href) == 0 || strings.HasPrefix(href, "javascript:") {
 			return
 		}
-		links = append(links, normalizeUrl(href, url))
+		links = append(links, NormalizeUrl(href, url))
 	})
 	return links, nil
 }
@@ -110,7 +110,7 @@ func (me *WebImageFs) OpenDir(name string, context *fuse.Context) (entries []fus
 		url_raw, _ := base64.StdEncoding.DecodeString(name)
 		url = string(url_raw) // utf-8
 	}
-	images, err := findImages(url)
+	images, err := FindImages(url)
 	if err != nil {
 		return nil, fuse.ENOENT
 	}
@@ -121,7 +121,7 @@ func (me *WebImageFs) OpenDir(name string, context *fuse.Context) (entries []fus
 		entries = append(entries, fuse.DirEntry{Name: nm, Mode: fuse.S_IFREG})
 	}
 
-	links, err := findLinks(url)
+	links, err := FindLinks(url)
 	if err != nil {
 		return nil, fuse.ENOENT
 	}

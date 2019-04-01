@@ -1,22 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
-func TestGetImages(t *testing.T) {
-	images, err := GetImages("http://pic.baidu.com")
-	if err != nil {
-		t.Error(err)
+func TestNormalizeUrl(t *testing.T) {
+	parent_url := "https://www.golang.org/doc.html"
+	cases := []struct {
+		in, out string
+	}{
+		{"/relative/sub.php", "https://www.golang.org/relative/sub.php"},
+		{"/relative.html", "https://www.golang.org/relative.html"},
 	}
-	fmt.Println(images)
+	for _, c := range cases {
+		got := NormalizeUrl(c.in, parent_url)
+		if got != c.out {
+			t.Errorf("NormalizeUrl(%q)==%q, want %q", c.in, got, c.out)
+		}
+	}
 }
 
-func TestGetLinks(t *testing.T) {
-	links, err := GetLinks("http://pic.baidu.com")
+func TestFindImages(t *testing.T) {
+	_, err := FindImages("http://pic.baidu.com")
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println(links)
+}
+
+func TestFindLinks(t *testing.T) {
+	_, err := FindLinks("http://pic.baidu.com")
+	if err != nil {
+		t.Error(err)
+	}
 }
